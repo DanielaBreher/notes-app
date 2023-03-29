@@ -20,7 +20,12 @@ function App() {
   const handleCreateNote = () => {
     setNotes((prevNotes) => [
       ...prevNotes,
-      { id: Math.random(), title: "Example note", date: new Date() },
+      {
+        id: Math.random(),
+        title: "Note",
+        content: "Example note",
+        date: new Date(),
+      },
     ]);
   };
 
@@ -51,8 +56,9 @@ function App() {
           {notes.map((note, index) => (
             <Grid xs={2} sm={4} md={3} key={index}>
               <Item>
-                <div>{note.title}</div>
                 <div>{note.date.toString().slice(0, 21)}</div>
+                <div>{note.title}</div>
+                <div>{note.content}</div>
                 <Button
                   onClick={() => handleDeleteNote(note.id)}
                   variant="contained"
