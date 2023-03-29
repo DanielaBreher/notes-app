@@ -16,18 +16,29 @@ const Item = styled(Paper)(({ theme }) => ({
 function App() {
   const [notes, setNotes] = useState([]);
   console.log(notes);
+
+  const handleCreateNote = () => {
+    setNotes((prevNotes) => [
+      ...prevNotes,
+      { id: Math.random(), title: "Example note", date: new Date() },
+    ]);
+  };
+
+  const handleDeleteNote = (id) => {
+    const isApproved = window.confirm(
+      "Are you sure you want to delete this note?"
+    );
+
+    if (!isApproved) {
+      return;
+    }
+    setNotes((prevNotes) => prevNotes.filter((n) => n.id !== id));
+  };
+
   return (
     <div className="App">
       <header>
-        <Button
-          onClick={() => {
-            setNotes((prevNotes) => [
-              ...prevNotes,
-              { title: "Example note", date: new Date() },
-            ]);
-          }}
-          variant="contained"
-        >
+        <Button onClick={handleCreateNote} variant="contained">
           Create Note
         </Button>
       </header>
@@ -41,7 +52,14 @@ function App() {
             <Grid xs={2} sm={4} md={3} key={index}>
               <Item>
                 <div>{note.title}</div>
-                <div>{note.date.toLocaleString("en-GB")}</div>
+                <div>{note.date.toString().slice(0, 21)}</div>
+                <Button
+                  onClick={() => handleDeleteNote(note.id)}
+                  variant="contained"
+                  color="error"
+                >
+                  Delete
+                </Button>
               </Item>
             </Grid>
           ))}
