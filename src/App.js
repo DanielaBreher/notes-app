@@ -4,6 +4,10 @@ import "./App.css";
 import { experimentalStyled as styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Unstable_Grid2";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
+import { Note } from "./components/note";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -13,8 +17,26 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
 function App() {
+  //     state , setState
   const [notes, setNotes] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedNoteId, setSelectedNoteId] = useState();
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   console.log(notes);
 
   const handleCreateNote = () => {
@@ -30,14 +52,24 @@ function App() {
   };
 
   const handleDeleteNote = (id) => {
-    const isApproved = window.confirm(
-      "Are you sure you want to delete this note?"
-    );
+    try {
+      const isApproved = window.confirm(
+        "Are you sure you want to delete this note?"
+      );
 
-    if (!isApproved) {
-      return;
+      if (!isApproved) {
+        handleClose();
+        return;
+      }
+      setNotes((prevNotes) => prevNotes.filter((n) => n.id !== id));
+    } finally {
+      handleClose();
     }
-    setNotes((prevNotes) => prevNotes.filter((n) => n.id !== id));
+  };
+
+  const handleItemClick = (id) => {
+    setSelectedNoteId(id);
+    handleOpen();
   };
 
   return (
@@ -55,22 +87,28 @@ function App() {
         >
           {notes.map((note, index) => (
             <Grid xs={2} sm={4} md={3} key={index}>
-              <Item>
-                <div>{note.date.toString().slice(0, 21)}</div>
-                <div>{note.title}</div>
-                <div>{note.content}</div>
-                <Button
-                  onClick={() => handleDeleteNote(note.id)}
-                  variant="contained"
-                  color="error"
-                >
-                  Delete
-                </Button>
+              <Item onClick={() => handleItemClick(note.id)}>
+                <Note note={note} handleDeleteNote={handleDeleteNote} />
               </Item>
             </Grid>
           ))}
         </Grid>
       </main>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            <Note
+              note={notes.find((note) => note.id === selectedNoteId)}
+              handleDeleteNote={handleDeleteNote}
+            />
+          </Typography>
+        </Box>
+      </Modal>
     </div>
   );
 }
