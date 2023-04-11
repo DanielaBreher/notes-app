@@ -108,7 +108,7 @@ function App() {
               label="Content"
               multiline
               required
-              rows={4}
+              minRows={4}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Enter note content"
