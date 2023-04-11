@@ -8,6 +8,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { Note } from "./components/note";
+import { TextField } from "@mui/material";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -29,26 +30,35 @@ const style = {
   p: 4,
 };
 
+const initialNotes = JSON.parse(localStorage.getItem("notes") || "[]");
+
 function App() {
   //     state , setState
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(initialNotes);
   const [open, setOpen] = useState(false);
+  const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
   const [selectedNoteId, setSelectedNoteId] = useState();
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   console.log(notes);
 
-  const handleCreateNote = () => {
-    setNotes((prevNotes) => [
-      ...prevNotes,
-      {
-        id: Math.random(),
-        title: "Note",
-        content: "Example note",
-        date: new Date(),
-      },
-    ]);
+  const handleCreateNote = (e) => {
+    e.preventDefault();
+    setNotes((prevNotes) => {
+      const updatedNotes = [
+        ...prevNotes,
+        {
+          id: Math.random(),
+          title: title,
+          content: content,
+          date: new Date(),
+        },
+      ];
+      localStorage.setItem("notes", JSON.stringify(updatedNotes));
+      return updatedNotes;
+    });
   };
 
   const handleDeleteNote = (id) => {
@@ -61,7 +71,11 @@ function App() {
         handleClose();
         return;
       }
-      setNotes((prevNotes) => prevNotes.filter((n) => n.id !== id));
+      setNotes((prevNotes) => {
+        const notesAfterDeletion = prevNotes.filter((n) => n.id !== id);
+        localStorage.setItem("notes", JSON.stringify(notesAfterDeletion));
+        return notesAfterDeletion;
+      });
     } finally {
       handleClose();
     }
@@ -75,9 +89,36 @@ function App() {
   return (
     <div className="App">
       <header>
-        <Button onClick={handleCreateNote} variant="contained">
-          Create Note
-        </Button>
+        <form onSubmit={handleCreateNote}>
+          <div>
+            <TextField
+              id="standard-multiline-flexible"
+              label="Title"
+              multiline
+              maxRows={4}
+              value={title}
+              placeholder="Enter Title"
+              onChange={(e) => setTitle(e.target.value)}
+              sx={{ marginBottom: "10px" }}
+            />
+          </div>
+          <div>
+            <TextField
+              id="outlined-multiline-static"
+              label="Content"
+              multiline
+              required
+              rows={4}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Enter note content"
+              sx={{ marginBottom: "10px" }}
+            />
+          </div>
+          <Button type="submit" variant="contained">
+            Create Note
+          </Button>
+        </form>
       </header>
       <main>
         <Grid
