@@ -11,9 +11,14 @@ export const Note = ({ note, handleDeleteNote }) => {
 
   return (
     <>
-      <div>{note.date.toString().slice(0, 21)}</div>
+      <div>{new Date(note.date).toLocaleString("en-GB")}</div>
       <div>{note.title}</div>
       <div>{note.content}</div>
+      {note.updateDate ? (
+        <div>
+          Updated at: {new Date(note.updateDate).toLocaleString("en-GB")}
+        </div>
+      ) : null}
       <Button onClick={handleDelete} variant="contained" color="error">
         Delete
       </Button>
